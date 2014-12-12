@@ -48,4 +48,8 @@ FG.video (Future Gadget video)
 	例：
 	curl -oa.f4v 'http://127.0.0.1/test.f4v?start=1234&end=1234'
 	curl -oa.f4v 'http://127.0.0.1/test.f4v?range=1024-4096&type=iqiyi'
+	
+作者：
+	NadiaF0rever	(eeiwant@gmail.com)
+
 
