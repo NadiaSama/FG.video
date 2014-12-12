@@ -1,0 +1,5 @@
+ngx_addon_name=FG.video
+HTTP_MODULES="$HTTP_MODULES ngx_http_flv_module ngx_http_mp4_module ngx_http_f4v_module"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_flv_module.c $ngx_addon_dir/ngx_http_flv_handler.c \
+$ngx_addon_dir/fgvideo_common_handler.c $ngx_addon_dir/fgvideo_youku_handler.c $ngx_addon_dir/ngx_http_mp4_module.c \
+$ngx_addon_dir/fgvideo_pptv_handler.c $ngx_addon_dir/fgvideo_iqiyi_handler.c $ngx_addon_dir/ngx_http_f4v_module.c"

@@ -1,0 +1,53 @@
+user   nginx;
+
+error_log  logs/error.log crit;
+
+events {
+    use epoll;
+}
+
+
+http {
+    log_format  main  '$remote_addr^$http_host^$request^$status'
+                      '^$body_bytes_sent^[$time_local]^$http_referer'
+                      '^$http_user_agent';
+
+    access_log  logs/access.log  main;
+    server {
+        listen       122.72.0.192:9090;
+        root   /usr/local/nginx/html;
+
+        location / {
+            index  index.html index.htm;
+        }
+
+        location ~ \.flv$ {  
+            flv;
+        } 
+
+        location ~ \.f4v$ {
+            f4v;
+        }
+
+        location ~ \.hlv$ {  
+            #hlv后缀为新浪视频后缀，处理方式同flv文件偏移
+            flv;
+        }  
+
+        location ~ \.fhv$ {
+            #fhv后缀为芒果视频后缀，处理方式同flv文件偏移
+            flv;
+        }
+
+        location ~ \.mp4$ {  
+            mp4;
+            mp4_buffer_size       5m;
+            mp4_max_buffer_size   15m;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+}
