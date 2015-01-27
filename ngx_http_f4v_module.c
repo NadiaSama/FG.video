@@ -58,7 +58,7 @@ ngx_module_t 	ngx_http_f4v_module = {
 static ngx_int_t
 ngx_http_f4v_handler(ngx_http_request_t *r){
 	if(iqiyi_request(r)){
-		fgvideo_iqiyi_handler(r);
+		return fgvideo_iqiyi_handler(r);
 	}
 	return ngx_http_flv_pos_handler(r);
 }
