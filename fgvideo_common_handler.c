@@ -5,6 +5,8 @@
 
 #include "fgvideo_common_handler.h"
 
+static ngx_int_t static_handler(ngx_http_request_t *r, ngx_str_t *name, \
+		ngx_open_file_info_t *of, ngx_chain_t **out);
 ngx_int_t
 fgvideo_common_handler(ngx_http_request_t *r, fgvideo_handler fun){
     u_char                    *last;
@@ -111,8 +113,8 @@ fgvideo_common_handler(ngx_http_request_t *r, fgvideo_handler fun){
 
     r->root_tested = !r->error_page;
 
-	if(fun(r, &path, &of, &out) != NGX_OK){
-		return NGX_HTTP_INTERNAL_SERVER_ERROR;
+	if((rc = fun(r, &path, &of, &out)) != NGX_OK){
+		return rc;
 	}
 
     if (ngx_http_set_etag(r) != NGX_OK) {
@@ -129,6 +131,12 @@ fgvideo_common_handler(ngx_http_request_t *r, fgvideo_handler fun){
 	}
 
 	return ngx_http_output_filter(r, out);
+}
+
+ngx_int_t
+fgvideo_static_handler(ngx_http_request_t *r)
+{
+	return fgvideo_common_handler(r, static_handler);
 }
 
 ngx_int_t
@@ -170,4 +178,45 @@ fgvideo_range_response(ngx_http_request_t *r, ngx_str_t *file_name, \
 	(*out)->next = NULL;
 	
 	return NGX_OK;
+}
+
+static ngx_int_t
+static_handler(ngx_http_request_t *r, ngx_str_t *file_name, \
+		ngx_open_file_info_t *of, ngx_chain_t **out)
+{
+	ngx_buf_t		*b;
+
+	r->headers_out.status = NGX_HTTP_OK;
+	r->headers_out.content_length_n = of->size;
+	r->headers_out.last_modified_time = of->mtime;
+
+	if((b = ngx_pcalloc(r->pool, sizeof(ngx_buf_t))) == NULL){
+		return NGX_HTTP_INTERNAL_SERVER_ERROR;
+	}
+
+	if((b->file = ngx_pcalloc(r->pool, sizeof(ngx_file_t))) == NULL){
+		return NGX_HTTP_INTERNAL_SERVER_ERROR;
+	}
+	r->allow_ranges = 1;
+
+	b->file_pos = 0;
+	b->file_last = of->size;
+	b->in_file = (b->file_last == 0) ? 0: 1;
+	b->last_buf = (r == r->main) ? 1: 0;
+	b->last_in_chain = 1;
+
+	b->file->fd = of->fd;
+	b->file->name = *file_name;
+	b->file->log = r->connection->log;
+	b->file->directio = of->is_directio;
+
+	if((*out = ngx_pcalloc(r->pool, sizeof(ngx_chain_t))) == NULL){
+		return NGX_HTTP_INTERNAL_SERVER_ERROR;
+	}
+
+	(*out)->buf = b;
+	(*out)->next = NULL;
+	
+	return NGX_OK;
+
 }

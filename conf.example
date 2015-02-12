@@ -45,6 +45,14 @@ http {
             mp4_max_buffer_size   15m;
         }
 
+		location ~ \.ts$ {
+			ts;
+		}
+
+		location ~ \.letv$ {
+			letv;
+		}
+
         error_page   500 502 503 504  /50x.html;
         location = /50x.html {
             root   html;

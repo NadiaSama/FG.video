@@ -74,7 +74,7 @@ static u_char *flv_strstr(const u_char *src, size_t src_len, const u_char *key, 
 static double flv_number(const u_char *str);
 
 static off_t flv_youku_getoffset_from_time(flv_info_t *flv_info, double start_time, double end_time, off_t *beg, off_t *end);
-static ngx_int_t flv_youku_findless_val(ngx_array_t *array, double val);
+static ngx_int_t flv_time_findless_val(ngx_array_t *array, double val);
 
 static double
 flv_number(const u_char *data){
@@ -144,7 +144,7 @@ flv_build_buf_from_pos(flv_info_t *flv_info, off_t start, off_t end){
 }
 
 static ngx_int_t
-flv_youku_findless_val(ngx_array_t *array, double val){
+flv_time_findless_val(ngx_array_t *array, double val){
 	double t;
 	double *data = (double *)array->elts;
 	size_t beg = 0, end = array->nelts - 1, middle;
@@ -231,14 +231,14 @@ flv_youku_getoffset_from_time(flv_info_t *flv_info, double start, double end, of
 	}
 
 	if(start != 0){
-		if((index = flv_youku_findless_val(times, start)) < 0) return NGX_HTTP_BAD_REQUEST;
+		if((index = flv_time_findless_val(times, start)) < 0) return NGX_HTTP_BAD_REQUEST;
 
 		*beg_pos = (off_t)*((double *)filepositions->elts + index);
 		ngx_log_debug4(NGX_LOG_DEBUG_HTTP, log, 0, "%V start=%f index=%d beg_pos=%l", &flv_info->file.name, start, index, *beg_pos);
 	}
 
 	if(end != 0){
-		if((index = flv_youku_findless_val(times, end)) < 0) return NGX_HTTP_BAD_REQUEST;
+		if((index = flv_time_findless_val(times, end)) < 0) return NGX_HTTP_BAD_REQUEST;
 
 		*end_pos = (off_t)*((double *)filepositions->elts + index);
 		ngx_log_debug4(NGX_LOG_DEBUG_HTTP, log, 0, "%V end=%f index=%d end_pos=%l", &flv_info->file.name, end, index, *end_pos);

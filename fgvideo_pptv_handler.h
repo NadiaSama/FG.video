@@ -5,4 +5,5 @@
 			"type=pptv", (r)->args.len) != NULL)
 
 ngx_int_t fgvideo_pptv_handler(ngx_http_request_t *r);
+
 #endif
